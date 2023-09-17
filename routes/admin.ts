@@ -1,25 +1,14 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router } from "express";
 
-const path = require('path');
 const express = require('express');
 
-const rootDir = require('../util/path');
+const productsController = require('../controllers/products');
 
 const router: Router = express.Router();
 
-const products: any = [];
+router.get('/add-product', productsController.getAddProductPage);
 
-router.get('/add-product', (req: Request, res: Response, next: NextFunction) => {
-  res.render('pages/add-product', {
-    docTitle: 'Add Product'
-  });
-});
+router.post('/add-product', productsController.postAddProduct)
 
-router.post('/add-product', (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body)
-  products.push({ title: req.body.title })
-  res.redirect('/');
-})
+module.exports = router;
 
-exports.routes = router;
-exports.products = products;
