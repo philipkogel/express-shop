@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-const products: any = [];
+const Product = require('../models/product');
 
 exports.getAddProductPage = (req: Request, res: Response) => {
   res.render('pages/add-product', {
@@ -10,15 +10,15 @@ exports.getAddProductPage = (req: Request, res: Response) => {
 }
 
 exports.postAddProduct = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body)
-  products.push({ title: req.body.title })
+  const product = new Product(req.body.title);
+  product.save();
   res.redirect('/');
 }
 
-exports.getProductsPage = (req: Request, res: Response, next: NextFunction) => {
+exports.getProductsPage = async (req: Request, res: Response, next: NextFunction) => {
   res.render('pages/shop', {
     docTitle: 'My Shop',
     path: '/',
-    products: products
+    products: await Product.fetchAll(),
   });
 }

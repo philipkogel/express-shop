@@ -1,11 +1,13 @@
 import { Express, NextFunction, Request, Response } from "express";
 
-const path = require('path')
-const express = require('express')
-const bodyParser = require('body-parser')
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-const adminRoutes = require('./routes/admin')
-const shopRoutes = require('./routes/shop')
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+const errorsController = require('./controllers/errors')
 
 const app: Express = express();
 
@@ -17,11 +19,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.status(404).render('pages/404', {
-    docTitle: 'Page Not Found',
-    path: '',
-  });
-});
+app.use(errorsController.get404ErrorPage);
 
 app.listen(5000);
