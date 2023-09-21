@@ -4,6 +4,12 @@ interface IProduct {
   title: string;
 }
 
+const getProductFilePath = () => (path.join(path.dirname(require.main?.filename), 'data', 'products.json'));
+
+const getProductsFromFile = async (): Promise<IProduct[]> => {
+  return await Bun.file(getProductFilePath()).json()
+}
+
 module.exports = class Product implements IProduct {
   title: string;
   constructor(title: string) {
@@ -12,16 +18,12 @@ module.exports = class Product implements IProduct {
 
   async save() {
     let productsFile: IProduct[] = [];
-    productsFile = await Bun.file(Product._getPath()).json();
+    productsFile = await getProductsFromFile();
     productsFile.push(this);
-    await Bun.write(Product._getPath(), JSON.stringify(productsFile));
+    await Bun.write(getProductFilePath(), JSON.stringify(productsFile));
   }
 
   static async fetchAll(): Promise<IProduct[]> {
-    return await Bun.file(Product._getPath()).json();
-  }
-
-  private static _getPath() {
-    return path.join(path.dirname(require.main?.filename), 'data', 'products.json');
+    return await getProductsFromFile();
   }
 }
