@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<%- include('../partials/head'); %>
+<%- include('../../partials/head'); %>
     <link rel="stylesheet" href="/css/product.css">
 </head>
 
 <body>
-    <%- include('../partials/nav'); %>
+    <%- include('../../partials/nav'); %>
 
     <main>
+        <h2>Admin Products</h2>
         <div class="grid">
             <% for (let product of products) { %>
                 <article class="card product-item">
