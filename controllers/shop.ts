@@ -7,6 +7,7 @@ exports.getIndexPage = async (req: Request, res: Response) => {
     docTitle: 'Fancy Shop',
     path: '/',
     products: await Product.fetchAll(),
+    isAdmin: false,
   })
 }
 
@@ -15,6 +16,7 @@ exports.getProductsPage = async (req: Request, res: Response) => {
     docTitle: 'Products',
     path: '/products',
     products: await Product.fetchAll(),
+    isAdmin: false,
   });
 }
 
@@ -31,5 +33,12 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
     docTitle: 'Checkout',
     path: '/checkout',
     products: await Product.fetchAll(),
+  });
+}
+
+exports.getOrdersPage = async (req: Request, res: Response) => {
+  res.render('pages/shop/orders', {
+    docTitle: 'Orders',
+    path: '/orders',
   });
 }
