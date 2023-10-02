@@ -2,7 +2,7 @@
   "name": "node-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "bun app.ts"
+    "start": "bun --hot app.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

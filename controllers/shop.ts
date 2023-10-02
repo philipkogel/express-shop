@@ -20,6 +20,16 @@ exports.getProductsPage = async (req: Request, res: Response) => {
   });
 }
 
+exports.getProductPage = async (req: Request, res: Response) => {
+  const product = await Product.fetch(req.params.id);
+  res.render('pages/shop/product-detail', {
+    docTitle: `Product - ${product.title}`,
+    path: `/products/${product.id}`,
+    product: product,
+    isAdmin: false,
+  });
+}
+
 exports.getCartPage = async (req: Request, res: Response) => {
   res.render('pages/shop/cart', {
     docTitle: 'Cart',

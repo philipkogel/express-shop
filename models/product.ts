@@ -38,4 +38,8 @@ module.exports = class Product implements IProduct {
   static async fetchAll(): Promise<IProduct[]> {
     return await getProductsFromFile();
   }
+
+  static async fetch(productId: string): Promise<IProduct | undefined> {
+    return (await this.fetchAll()).find((product: IProduct) => product.id === productId)
+  }
 }
