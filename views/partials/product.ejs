@@ -18,9 +18,7 @@
               </form>
             </div>
           <% } else { %>
-            <form action="/add-to-cart" method="POST">
-              <button type="submit" class="btn">Add to Cart</button>
-            </form>
+            <%- include('product-add-cart'); %>
           <% } %>
         </div>
     </article>
