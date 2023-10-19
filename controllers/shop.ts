@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 const Product = require('../models/product');
+const Cart = require('../models/cart');
 
 exports.getIndexPage = async (req: Request, res: Response) => {
   res.render('pages/shop/index', {
@@ -42,7 +43,10 @@ exports.getCartPage = async (req: Request, res: Response) => {
 
 exports.postCart = async (req: Request, res: Response) => {
   const productId = req.body.productId;
-  console.log(productId);
+  const product = await Product.fetch(productId)
+  if (product) {
+    await Cart.add(product.id, product.price)
+  }
   res.redirect('/cart');
 }
 
