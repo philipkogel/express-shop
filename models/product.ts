@@ -1,6 +1,7 @@
 const path = require('path');
 
 interface IProduct {
+  id: string;
   title: string;
   imageUrl: string;
   description: string;
@@ -14,11 +15,13 @@ const getProductsFromFile = async (): Promise<IProduct[]> => {
 }
 
 module.exports = class Product implements IProduct {
+  id: string;
   title: string;
   imageUrl: string;
   description: string;
   price: number;
   constructor(title: string, imageUrl: string, price: number, description: string,) {
+    this.id = crypto.randomUUID()
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
@@ -34,5 +37,9 @@ module.exports = class Product implements IProduct {
 
   static async fetchAll(): Promise<IProduct[]> {
     return await getProductsFromFile();
+  }
+
+  static async fetch(productId: string): Promise<IProduct | undefined> {
+    return (await this.fetchAll()).find((product: IProduct) => product.id === productId)
   }
 }
