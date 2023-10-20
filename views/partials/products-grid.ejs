@@ -16,7 +16,7 @@
           <div class="card__actions">
             <% if (isAdmin) { %>
               <div class="actions__admin">
-                <button class="btn">Edit</button>
+                <a href="/admin/edit-product/<%= product.id %>?edit=true" class="btn">Edit</a>
                 <form action="/admin/delete-product" method="POST">
                   <button type="submit" class="btn">Delete</button>
                 </form>
