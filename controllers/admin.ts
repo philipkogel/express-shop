@@ -33,11 +33,10 @@ exports.postAddProduct = (req: Request, res: Response) => {
 }
 
 exports.postEditProduct = (req: Request, res: Response) => {
-  //TODO: Change logic for update
-  const { title, imageUrl, price, description } = req.body;
-  const product = new Product(title, imageUrl, price, description);
+  const { title, imageUrl, price, description, id } = req.body;
+  const product = new Product(title, imageUrl, price, description, id);
   product.save();
-  res.redirect('/');
+  res.redirect('/admin/products');
 }
 
 exports.getProductsPage = async (req: Request, res: Response) => {

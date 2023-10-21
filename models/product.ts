@@ -20,8 +20,8 @@ module.exports = class Product implements IProduct {
   imageUrl: string;
   description: string;
   price: number;
-  constructor(title: string, imageUrl: string, price: number, description: string,) {
-    this.id = crypto.randomUUID()
+  constructor(title: string, imageUrl: string, price: number, description: string, id?: string) {
+    this.id = id ? id : crypto.randomUUID()
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
@@ -31,7 +31,16 @@ module.exports = class Product implements IProduct {
   async save() {
     let productsFile: IProduct[] = [];
     productsFile = await getProductsFromFile();
-    productsFile.push(this);
+    if (this.id) {
+      const productIndex = productsFile.findIndex((p) => p.id === this.id);
+      const updatedProducts = [...productsFile]
+      if (productIndex !== -1) {
+        updatedProducts[productIndex] = { ...this }
+      }
+      productsFile = updatedProducts;
+    } else {
+      productsFile.push(this);
+    }
     await Bun.write(getProductFilePath(), JSON.stringify(productsFile));
   }
 
