@@ -46,4 +46,14 @@ module.exports = class Cart implements ICart {
     cart.totalPrice = cart.totalPrice + +productPrice
     await Bun.write(getCartFilePath(), JSON.stringify(cart))
   }
+
+  static async delete (id: string, productPrice: number): Promise<void> {
+    const cart = await getCartFromFile()
+    const updatedCart = { ...cart }
+    const product = updatedCart.products.find((p) => p.id === id)
+    const productQty = product?.qty
+    updatedCart.products = updatedCart.products.filter(prod => prod.id !== id)
+    updatedCart.totalPrice = cart.totalPrice - productPrice * (productQty ?? 1)
+    await Bun.write(getCartFilePath(), JSON.stringify(updatedCart))
+  }
 }

@@ -1,11 +1,14 @@
 const path = require('path')
 
+const Cart = require('cart')
+
 interface IProduct {
   id?: string
   title: string
   imageUrl: string
   description: string
   price: number
+  deletedAt: string | undefined
 }
 
 const getProductFilePath = (): string => (path.join(path.dirname(require.main?.filename), 'data', 'products.json'))
@@ -20,19 +23,21 @@ module.exports = class Product implements IProduct {
   imageUrl: string
   description: string
   price: number
-  constructor (title: string, imageUrl: string, price: number, description: string, id?: string) {
+  deletedAt: string | undefined
+  constructor (title: string, imageUrl: string, price: number, description: string, id?: string, deletedAt?: string) {
     this.id = id ?? crypto.randomUUID()
     this.title = title
     this.imageUrl = imageUrl
     this.description = description
     this.price = price
+    this.deletedAt = deletedAt
   }
 
   async save (): Promise<void> {
     let productsFile: IProduct[] = []
     productsFile = await getProductsFromFile()
-    if (this.id !== undefined) {
-      const productIndex = productsFile.findIndex((p) => p.id === this.id)
+    const productIndex = productsFile.findIndex((p) => p.id === this.id)
+    if (productIndex !== -1) {
       const updatedProducts = [...productsFile]
       if (productIndex !== -1) {
         updatedProducts[productIndex] = { ...this }
@@ -45,10 +50,22 @@ module.exports = class Product implements IProduct {
   }
 
   static async fetchAll (): Promise<IProduct[]> {
-    return await getProductsFromFile()
+    return (await getProductsFromFile()).filter((p) => p.deletedAt === undefined)
   }
 
   static async fetch (productId: string): Promise<IProduct | undefined> {
     return (await this.fetchAll()).find((product: IProduct) => product.id === productId)
+  }
+
+  static async remove (id: string): Promise<void> {
+    const products: IProduct[] = await getProductsFromFile()
+    const productIndex = products.findIndex((p) => p.id === id)
+    if (productIndex !== -1) {
+      const updatedProducts = [...products]
+      updatedProducts[productIndex] = { ...products[productIndex], deletedAt: new Date().toISOString() }
+      await Bun.write(getProductFilePath(), JSON.stringify(updatedProducts)).then(() => {
+        Cart.delete(id, products[productIndex].price)
+      })
+    }
   }
 }
