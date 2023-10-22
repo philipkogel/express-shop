@@ -47,3 +47,10 @@ exports.getProductsPage = async (req: Request, res: Response) => {
     isAdmin: true
   })
 }
+
+exports.postDeleteProduct = async (req: Request, res: Response) => {
+  const { id } = req.body
+  console.log(id)
+  await Product.remove(id)
+  res.redirect('/admin/products')
+}
