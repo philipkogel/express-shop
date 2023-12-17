@@ -1,15 +1,8 @@
+import { type IProduct } from '.'
+
 const path = require('path')
 
-const Cart = require('cart')
-
-interface IProduct {
-  id?: string
-  title: string
-  imageUrl: string
-  description: string
-  price: number
-  deletedAt: string | undefined
-}
+const Cart = require('../models/cart')
 
 const getProductFilePath = (): string => (path.join(path.dirname(require.main?.filename), 'data', 'products.json'))
 

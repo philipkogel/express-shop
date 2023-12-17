@@ -1,20 +1,14 @@
+import { type ICart, type ICartProduct } from '.'
+
 const path = require('path')
+
+const Product = require('../models/product')
 
 const getCartFilePath = (): string => (path.join(path.dirname(require.main?.filename), 'data', 'cart.json'))
 
 const getCartFromFile = async (): Promise<ICart> => {
   const cart = await Bun.file(getCartFilePath()).json()
   return cart ?? { products: [], totalPrice: 0 }
-}
-
-interface ICartProduct {
-  id: string
-  qty: number
-}
-
-interface ICart {
-  products: ICartProduct[]
-  totalPrice: number
 }
 
 module.exports = class Cart implements ICart {
@@ -51,9 +45,16 @@ module.exports = class Cart implements ICart {
     const cart = await getCartFromFile()
     const updatedCart = { ...cart }
     const product = updatedCart.products.find((p) => p.id === id)
-    const productQty = product?.qty
+    if (!product) {
+      return
+    }
+    const productQty = product.qty
     updatedCart.products = updatedCart.products.filter(prod => prod.id !== id)
-    updatedCart.totalPrice = cart.totalPrice - productPrice * (productQty ?? 1)
+    updatedCart.totalPrice = cart.totalPrice - productPrice * productQty
     await Bun.write(getCartFilePath(), JSON.stringify(updatedCart))
+  }
+
+  static async fetch (): Promise<ICart> {
+    return await getCartFromFile()
   }
 }

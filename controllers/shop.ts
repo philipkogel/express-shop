@@ -1,4 +1,5 @@
 import { type Request, type Response } from 'express'
+import { type ICartProduct, type ICart, type IProduct } from '../models'
 
 const Product = require('../models/product')
 const Cart = require('../models/cart')
@@ -23,7 +24,7 @@ exports.getProductsPage = async (req: Request, res: Response) => {
 
 exports.getProductPage = async (req: Request, res: Response) => {
   const product = await Product.fetch(req.params.id)
-  if (product !== undefined) {
+  if (product) {
     res.render('pages/shop/product-detail', {
       docTitle: `Product - ${product.title}`,
       path: `/products/${product.id}`,
@@ -34,19 +35,47 @@ exports.getProductPage = async (req: Request, res: Response) => {
 }
 
 exports.getCartPage = async (req: Request, res: Response) => {
+  const cart: ICart = await Cart.fetch()
+  const products: IProduct[] = await Product.fetchAll()
+  const cartProducts: Array<{ productData: IProduct, qty: number }> = []
+  for (const product of products) {
+    const cartProductData = cart.products.find((prod: ICartProduct) => prod.id === product.id)
+    if (cartProductData) {
+      cartProducts.push({ productData: product, qty: cartProductData.qty })
+    }
+  }
   res.render('pages/shop/cart', {
     docTitle: 'Cart',
     path: '/cart',
-    products: await Product.fetchAll()
+    cartProducts
   })
 }
 
 exports.postCart = async (req: Request, res: Response) => {
   const productId = req.body.productId
   const product = await Product.fetch(productId)
-  if (product !== undefined) {
+  if (product) {
     await Cart.add(product.id, product.price)
   }
+  res.redirect('/cart')
+}
+
+exports.postCart = async (req: Request, res: Response) => {
+  const productId = req.body.productId
+  const product = await Product.fetch(productId)
+  if (product) {
+    await Cart.add(product.id, product.price)
+  }
+  res.redirect('/cart')
+}
+
+exports.postCartDeleteItem = async (req: Request, res: Response) => {
+  const productId = req.body.productId
+  const product = await Product.fetch(productId)
+  if (product) {
+    Cart.delete(productId, product.price)
+  }
+
   res.redirect('/cart')
 }
 
