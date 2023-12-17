@@ -45,9 +45,12 @@ module.exports = class Cart implements ICart {
     const cart = await getCartFromFile()
     const updatedCart = { ...cart }
     const product = updatedCart.products.find((p) => p.id === id)
-    const productQty = product?.qty
+    if (!product) {
+      return
+    }
+    const productQty = product.qty
     updatedCart.products = updatedCart.products.filter(prod => prod.id !== id)
-    updatedCart.totalPrice = cart.totalPrice - productPrice * (productQty ?? 1)
+    updatedCart.totalPrice = cart.totalPrice - productPrice * productQty
     await Bun.write(getCartFilePath(), JSON.stringify(updatedCart))
   }
 
