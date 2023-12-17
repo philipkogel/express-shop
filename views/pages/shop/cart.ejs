@@ -12,8 +12,20 @@
         <div class="grid">
           <div>Cart</div>
         </div>
-        <% if (products.length === 0) { %>
+        <% if (cartProducts.length === 0) { %>
             <h1>No Products</h1>
+        <% } else { %>
+            <% for (let cartProduct of cartProducts) { %>
+                <ul>
+                    <li>
+                        <p><%= cartProduct.productData.title %> (<%= cartProduct.qty %>)</p>
+                        <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" value="<%= cartProduct.productData.id %>" name="productId" />
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </li>
+                </ul>
+            <% } %>
         <% } %>
     </main>
 </body>
