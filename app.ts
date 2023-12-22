@@ -8,6 +8,7 @@ const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 
 const errorsController = require('./controllers/errors')
+const sequelize = require('./util/db')
 
 const app: Express = express()
 
@@ -21,4 +22,6 @@ app.use(shopRoutes)
 
 app.use(errorsController.get404ErrorPage)
 
-app.listen(5000)
+sequelize.sync()
+  .then(() => app.listen(5000))
+  .catch((err: any) => { console.log(err) })

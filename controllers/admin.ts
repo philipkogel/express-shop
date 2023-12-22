@@ -27,15 +27,18 @@ exports.getEditProductPage = async (req: Request, res: Response) => {
 
 exports.postAddProduct = (req: Request, res: Response) => {
   const { title, imageUrl, price, description } = req.body
-  const product = new Product(title, imageUrl, price, description)
-  product.save()
-  res.redirect('/')
+  Product.create({
+    title,
+    price,
+    imageUrl,
+    description
+  }).then(() => { res.redirect('/') }).catch((err: Error) => { console.log(err) })
 }
 
 exports.postEditProduct = (req: Request, res: Response) => {
   const { title, imageUrl, price, description, id } = req.body
   const product = new Product(title, imageUrl, price, description, id)
-  product.save()
+  product.save().then().catch((err: Error) => { console.log(err) })
   res.redirect('/admin/products')
 }
 

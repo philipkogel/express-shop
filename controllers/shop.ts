@@ -17,13 +17,13 @@ exports.getProductsPage = async (req: Request, res: Response) => {
   res.render('pages/shop/product-list', {
     docTitle: 'Products',
     path: '/products',
-    products: await Product.fetchAll(),
+    products: await Product.findAll(),
     isAdmin: false
   })
 }
 
 exports.getProductPage = async (req: Request, res: Response) => {
-  const product = await Product.fetch(req.params.id)
+  const product = await Product.findByPk(req.params.id)
   if (product) {
     res.render('pages/shop/product-detail', {
       docTitle: `Product - ${product.title}`,
