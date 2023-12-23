@@ -5,25 +5,34 @@ const Product = require('../models/product')
 const Cart = require('../models/cart')
 
 exports.getIndexPage = async (req: Request, res: Response) => {
-  res.render('pages/shop/index', {
-    docTitle: 'Fancy Shop',
-    path: '/',
-    products: await Product.fetchAll(),
-    isAdmin: false
-  })
+  await Product.findAll()
+    .then((products: IProduct[]) => {
+      res.render('pages/shop/index', {
+        docTitle: 'Fancy Shop',
+        path: '/',
+        products,
+        isAdmin: false
+      })
+    })
+    .catch((err: any) => { console.log(err) })
 }
 
 exports.getProductsPage = async (req: Request, res: Response) => {
-  res.render('pages/shop/product-list', {
-    docTitle: 'Products',
-    path: '/products',
-    products: await Product.findAll(),
-    isAdmin: false
-  })
+  await Product.findAll()
+    .then((products: IProduct[]) => {
+      res.render('pages/shop/product-list', {
+        docTitle: 'Products',
+        path: '/products',
+        products,
+        isAdmin: false
+      })
+    })
+    .catch((err: any) => { console.log(err) })
 }
 
 exports.getProductPage = async (req: Request, res: Response) => {
   const product = await Product.findByPk(req.params.id)
+    .catch((err: any) => { console.log(err) })
   if (product) {
     res.render('pages/shop/product-detail', {
       docTitle: `Product - ${product.title}`,
@@ -31,6 +40,8 @@ exports.getProductPage = async (req: Request, res: Response) => {
       product,
       isAdmin: false
     })
+  } else {
+    res.redirect('/')
   }
 }
 
