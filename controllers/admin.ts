@@ -13,19 +13,25 @@ exports.getAddProductPage = (req: Request, res: Response) => {
 }
 
 exports.getEditProductPage = async (req: Request, res: Response) => {
-  const product = await Product.findByPk(req.params.id)
+  req.user.getProducts({
+    where: {
+      id: req.params.id
+    }
+  }).then((products: IProduct[]) => {
+    const product = products[0]
+    if (product) {
+      const editMode = req.query.edit
+      res.render('pages/admin/edit-product', {
+        docTitle: 'Edit Product',
+        path: '/admin/edit-product',
+        editMode,
+        product
+      })
+    } else {
+      res.redirect('/')
+    }
+  })
     .catch((err: any) => { console.log(err) })
-  if (product) {
-    const editMode = req.query.edit
-    res.render('pages/admin/edit-product', {
-      docTitle: 'Edit Product',
-      path: '/admin/edit-product',
-      editMode,
-      product
-    })
-  } else {
-    res.redirect('/')
-  }
 }
 
 exports.postAddProduct = (req: Request, res: Response) => {
@@ -42,7 +48,8 @@ exports.postEditProduct = (req: Request, res: Response) => {
   const { title, imageUrl, price, description, id } = req.body
   Product.update({ title, imageUrl, price, description }, {
     where: {
-      id
+      id,
+      userId: req.user.id
     }
   })
     .then(() => { res.redirect('/admin/products') })
@@ -50,7 +57,7 @@ exports.postEditProduct = (req: Request, res: Response) => {
 }
 
 exports.getProductsPage = async (req: Request, res: Response) => {
-  await Product.findAll()
+  req.user.getProducts()
     .then((products: IProduct[]) => {
       res.render('pages/admin/product-list', {
         docTitle: 'Admin Products',
@@ -66,7 +73,8 @@ exports.postDeleteProduct = async (req: Request, res: Response) => {
   const { id } = req.body
   Product.destroy({
     where: {
-      id
+      id,
+      userId: req.user.id
     }
   })
     .then(() => { res.redirect('/admin/products') })
