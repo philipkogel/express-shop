@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express'
 import { type ICartProduct, type ICart, type IProduct } from '../models'
+import { type Model } from 'sequelize'
 
 const Product = require('../models/product')
 const Cart = require('../models/cart')
@@ -46,38 +47,33 @@ exports.getProductPage = async (req: Request, res: Response) => {
 }
 
 exports.getCartPage = async (req: Request, res: Response) => {
-  const cart: ICart = await Cart.fetch()
-  const products: IProduct[] = await Product.fetchAll()
-  const cartProducts: Array<{ productData: IProduct, qty: number }> = []
-  for (const product of products) {
-    const cartProductData = cart.products.find((prod: ICartProduct) => prod.id === product.id)
-    if (cartProductData) {
-      cartProducts.push({ productData: product, qty: cartProductData.qty })
-    }
-  }
-  res.render('pages/shop/cart', {
-    docTitle: 'Cart',
-    path: '/cart',
-    cartProducts
+  req.user.getCart().then(async (cart: any) => {
+    const cartProducts = await cart.getProducts()
+    res.render('pages/shop/cart', {
+      docTitle: 'Cart',
+      path: '/cart',
+      cartProducts
+    })
   })
+    .catch((err: Error) => { console.log(err) })
 }
 
 exports.postCart = async (req: Request, res: Response) => {
   const productId = req.body.productId
-  const product = await Product.fetch(productId)
-  if (product) {
-    await Cart.add(product.id, product.price)
-  }
-  res.redirect('/cart')
-}
-
-exports.postCart = async (req: Request, res: Response) => {
-  const productId = req.body.productId
-  const product = await Product.fetch(productId)
-  if (product) {
-    await Cart.add(product.id, product.price)
-  }
-  res.redirect('/cart')
+  req.user.getCart()
+    .then(async (cart: any) => {
+      const cartProducts = await cart.getProducts({ where: { id: productId } })
+      if (cartProducts.length > 0) {
+        const prod = cartProducts[0]
+        const quantity = prod.cartItem.quantity + 1
+        await cart.addProduct(prod, { through: { quantity } })
+      } else {
+        const prod = await Product.findByPk(productId)
+        cart.addProduct(prod)
+      }
+    })
+    .then(() => { res.redirect('/cart') })
+    .catch((err: Error) => { console.log(err) })
 }
 
 exports.postCartDeleteItem = async (req: Request, res: Response) => {

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <%- include('../../partials/head'); %>
-    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/cart.css">
 </head>
 
 <body>
@@ -16,12 +16,13 @@
             <h1>No Products</h1>
         <% } else { %>
             <% for (let cartProduct of cartProducts) { %>
-                <ul>
-                    <li>
-                        <p><%= cartProduct.productData.title %> (<%= cartProduct.qty %>)</p>
+                <ul class="cart__item-list">
+                    <li class="cart__item">
+                        <h1><%= cartProduct.title %></h1>
+                        <h2>Quantity: <%= cartProduct.cartItem.quantity %></h2>
                         <form action="/cart-delete-item" method="POST">
-                            <input type="hidden" value="<%= cartProduct.productData.id %>" name="productId" />
-                            <button class="btn" type="submit">Delete</button>
+                            <input type="hidden" value="<%= cartProduct.id %>" name="productId" />
+                            <button class="btn danger" type="submit">Delete</button>
                         </form>
                     </li>
                 </ul>
