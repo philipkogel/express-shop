@@ -78,12 +78,14 @@ exports.postCart = async (req: Request, res: Response) => {
 
 exports.postCartDeleteItem = async (req: Request, res: Response) => {
   const productId = req.body.productId
-  const product = await Product.fetch(productId)
-  if (product) {
-    Cart.delete(productId, product.price)
-  }
-
-  res.redirect('/cart')
+  req.user.getCart().then(async (cart: any) => {
+    const products = await cart.getProducts({ where: { id: productId } })
+    if (products.length > 0) {
+      await products[0].cartItem.destroy()
+    }
+  })
+    .then(() => { res.redirect('/cart') })
+    .catch((err: any) => { console.log(err) })
 }
 
 exports.getCheckoutPage = async (req: Request, res: Response) => {
