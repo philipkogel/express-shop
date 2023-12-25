@@ -1,4 +1,5 @@
 import { type Express, type Request } from 'express'
+import { type MongoClient } from 'mongodb'
 
 const path = require('path')
 const express = require('express')
@@ -8,6 +9,7 @@ const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 
 const errorsController = require('./controllers/errors')
+const mongoConnect = require('./util/mongo-db')
 const sequelize = require('./util/db')
 const Product = require('./models/product')
 const User = require('./models/user')
@@ -51,5 +53,11 @@ Cart.belongsToMany(Product, { through: CartItem })
 Product.belongsToMany(Cart, { through: CartItem })
 
 sequelize.sync()
-  .then(() => app.listen(5000))
-  .catch((err: any) => { console.log(err) })
+  .then(() => mongoConnect((client: MongoClient) => {
+    console.log(client)
+    app.listen(5000)
+  }))
+  .catch((err: any) => {
+    console.log(err)
+    throw err
+  })
