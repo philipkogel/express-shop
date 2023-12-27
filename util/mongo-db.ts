@@ -1,16 +1,28 @@
-import { type MongoClient } from 'mongodb'
+import { type Db, type MongoClient } from 'mongodb'
 
 const mongodb = require('mongodb')
 
 const mongoClient = mongodb.MongoClient
 
-const mongoConnect = (cb: (result: MongoClient) => void): void => {
+let _db: Db
+
+const mongoConnect = (cb: (client: MongoClient) => void): void => {
   mongoClient.connect('mongodb://shop:root@localhost:27017?authSource=admin')
-    .then((result: MongoClient) => {
-      console.log('CONNECTED TO MONGO')
-      cb(result)
+    .then((client: MongoClient) => {
+      console.log('Connected to MongoDV')
+      _db = client.db('shop')
+      cb(client)
     })
     .catch((err: Error) => { console.log(err) })
 }
 
-module.exports = mongoConnect
+const getDb = (): Db => {
+  if (_db) {
+    return _db
+  }
+  // eslint-disable-next-line @typescript-eslint/no-throw-literal
+  throw 'No Database Connection.'
+}
+
+exports.mongoConnect = mongoConnect
+exports.getDb = getDb

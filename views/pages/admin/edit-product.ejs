@@ -53,7 +53,7 @@
                 </textarea>
             </div>
             <% if (editMode) { %>
-                <input type="hidden" name="id" value="<%= product.id %>">
+                <input type="hidden" name="id" value="<%= product._id %>">
             <% } %>
             <button class="btn" type="submit">
                 <% if (editMode) { %>Update product<% } else { %>Add product<% } %>

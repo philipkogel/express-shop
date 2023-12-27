@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express'
-import { type IProduct } from '../models'
+import { type TProduct } from '../models'
 
-const Product = require('../models/product')
+const AdminProduct = require('../models/admin-product')
 
 exports.getAddProductPage = (req: Request, res: Response) => {
   const editMode = req.query.edit
@@ -13,52 +13,49 @@ exports.getAddProductPage = (req: Request, res: Response) => {
 }
 
 exports.getEditProductPage = async (req: Request, res: Response) => {
-  req.user.getProducts({
-    where: {
-      id: req.params.id
-    }
-  }).then((products: IProduct[]) => {
-    const product = products[0]
-    if (product) {
-      const editMode = req.query.edit
-      res.render('pages/admin/edit-product', {
-        docTitle: 'Edit Product',
-        path: '/admin/edit-product',
-        editMode,
-        product
-      })
-    } else {
-      res.redirect('/')
-    }
-  })
-    .catch((err: any) => { console.log(err) })
+  const product = await AdminProduct.findById(req.params.id, req.user.id)
+  if (product) {
+    const editMode = req.query.edit
+    res.render('pages/admin/edit-product', {
+      docTitle: 'Edit Product',
+      path: '/admin/edit-product',
+      editMode,
+      product
+    })
+  } else {
+    res.redirect('/')
+  }
 }
 
 exports.postAddProduct = (req: Request, res: Response) => {
   const { title, imageUrl, price, description } = req.body
-  req.user?.createProduct({
+  const { id } = req.user
+  new AdminProduct({
     title,
     price,
     imageUrl,
-    description
-  }).then(() => { res.redirect('/admin/products') }).catch((err: Error) => { console.log(err) })
+    description,
+    userId: id
+  }).save().then(() => { res.redirect('/admin/products') })
 }
 
 exports.postEditProduct = (req: Request, res: Response) => {
   const { title, imageUrl, price, description, id } = req.body
-  Product.update({ title, imageUrl, price, description }, {
-    where: {
-      id,
-      userId: req.user.id
-    }
-  })
+  new AdminProduct({
+    _id: id,
+    title,
+    price,
+    imageUrl,
+    description,
+    userId: req.user.id
+  }).update()
     .then(() => { res.redirect('/admin/products') })
-    .catch((err: any) => { console.log(err) })
 }
 
 exports.getProductsPage = async (req: Request, res: Response) => {
-  req.user.getProducts()
-    .then((products: IProduct[]) => {
+  const { id } = req.user
+  AdminProduct.findAll(id)
+    .then((products: TProduct[]) => {
       res.render('pages/admin/product-list', {
         docTitle: 'Admin Products',
         path: '/admin/products',
@@ -71,12 +68,7 @@ exports.getProductsPage = async (req: Request, res: Response) => {
 
 exports.postDeleteProduct = async (req: Request, res: Response) => {
   const { id } = req.body
-  Product.destroy({
-    where: {
-      id,
-      userId: req.user.id
-    }
-  })
+  await AdminProduct.delete(id)
     .then(() => { res.redirect('/admin/products') })
     .catch((err: any) => { console.log(err) })
 }

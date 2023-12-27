@@ -1,5 +1,4 @@
 import { type Express, type Request } from 'express'
-import { type MongoClient } from 'mongodb'
 
 const path = require('path')
 const express = require('express')
@@ -9,12 +8,12 @@ const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 
 const errorsController = require('./controllers/errors')
-const mongoConnect = require('./util/mongo-db')
+const mongoConnect = require('./util/mongo-db').mongoConnect
 const sequelize = require('./util/db')
-const Product = require('./models/product')
+// const Product = require('./models/product')
 const User = require('./models/user')
-const Cart = require('./models/cart')
-const CartItem = require('./models/cart-item')
+// const Cart = require('./models/cart')
+// const CartItem = require('./models/cart-item')
 
 const app: Express = express()
 
@@ -34,7 +33,7 @@ app.use((req: Request, res, next) => {
         User.create({ email: 'example@email.com', name: 'User1' })
           .then((user: any) => {
             req.user = user
-            user.createCart()
+            // user.createCart()
             next()
           })
       }
@@ -46,15 +45,14 @@ app.use(shopRoutes)
 
 app.use(errorsController.get404ErrorPage)
 
-Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-User.hasMany(Product)
-User.hasOne(Cart)
-Cart.belongsToMany(Product, { through: CartItem })
-Product.belongsToMany(Cart, { through: CartItem })
+// Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
+// User.hasMany(Product)
+// User.hasOne(Cart)
+// Cart.belongsToMany(Product, { through: CartItem })
+// Product.belongsToMany(Cart, { through: CartItem })
 
 sequelize.sync()
-  .then(() => mongoConnect((client: MongoClient) => {
-    console.log(client)
+  .then(() => mongoConnect(() => {
     app.listen(5000)
   }))
   .catch((err: any) => {
