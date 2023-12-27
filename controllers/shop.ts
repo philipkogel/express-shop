@@ -67,7 +67,7 @@ exports.postCart = async (req: Request, res: Response) => {
         await cart.addProduct(prod, { through: { quantity } })
       } else {
         const prod = await Product.findByPk(productId)
-        cart.addProduct(prod)
+        await cart.addProduct(prod)
       }
     })
     .then(() => { res.redirect('/cart') })
@@ -95,8 +95,27 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
 }
 
 exports.getOrdersPage = async (req: Request, res: Response) => {
-  res.render('pages/shop/orders', {
-    docTitle: 'Orders',
-    path: '/orders'
+  req.user.getOrders({ include: ['products'] })
+    .then((orders: any[]) => {
+      res.render('pages/shop/orders', {
+        docTitle: 'Your Orders',
+        path: '/orders',
+        orders
+      })
+    })
+    .catch((err: Error) => { console.log(err) })
+}
+
+exports.postOrder = async (req: Request, res: Response) => {
+  req.user.getCart().then(async (cart: any) => {
+    const products = await cart.getProducts()
+    const newOrder = await req.user.createOrder()
+    await newOrder.addProducts(products.map((product: any) => {
+      product.orderItem = { quantity: product.cartItem.quantity }
+      return product
+    }))
+    await cart.setProducts(null)
+    res.redirect(`/orders/${newOrder.id}`)
   })
+    .catch((err: Error) => { console.log(err) })
 }

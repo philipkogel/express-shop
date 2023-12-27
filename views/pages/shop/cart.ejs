@@ -15,8 +15,8 @@
         <% if (cartProducts.length === 0) { %>
             <h1>No Products</h1>
         <% } else { %>
+            <ul class="cart__item-list">
             <% for (let cartProduct of cartProducts) { %>
-                <ul class="cart__item-list">
                     <li class="cart__item">
                         <h1><%= cartProduct.title %></h1>
                         <h2>Quantity: <%= cartProduct.cartItem.quantity %></h2>
@@ -25,8 +25,13 @@
                             <button class="btn danger" type="submit">Delete</button>
                         </form>
                     </li>
-                </ul>
             <% } %>
+            </ul>
+            <div class="centered">
+                <form action="/create-order" method="POST">
+                    <button type=""submit class="btn">Order Now</button>
+                </form>
+            </div>
         <% } %>
     </main>
 </body>
