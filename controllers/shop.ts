@@ -1,11 +1,12 @@
 import { type Request, type Response } from 'express'
-import { type IProduct } from '../models'
+import { type TProduct } from '../models'
 
+const mongodb = require('mongodb')
 const Product = require('../models/product')
 
 exports.getIndexPage = async (req: Request, res: Response) => {
   await Product.findAll()
-    .then((products: IProduct[]) => {
+    .then((products: TProduct[]) => {
       res.render('pages/shop/index', {
         docTitle: 'Fancy Shop',
         path: '/',
@@ -18,7 +19,7 @@ exports.getIndexPage = async (req: Request, res: Response) => {
 
 exports.getProductsPage = async (req: Request, res: Response) => {
   await Product.findAll()
-    .then((products: IProduct[]) => {
+    .then((products: TProduct[]) => {
       res.render('pages/shop/product-list', {
         docTitle: 'Products',
         path: '/products',
@@ -30,12 +31,11 @@ exports.getProductsPage = async (req: Request, res: Response) => {
 }
 
 exports.getProductPage = async (req: Request, res: Response) => {
-  const product = await Product.findByPk(req.params.id)
-    .catch((err: any) => { console.log(err) })
+  const product: TProduct = await Product.findById(req.params.id)
   if (product) {
     res.render('pages/shop/product-detail', {
       docTitle: `Product - ${product.title}`,
-      path: `/products/${product.id}`,
+      path: `/products/${product._id}`,
       product,
       isAdmin: false
     })

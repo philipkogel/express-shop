@@ -16,14 +16,14 @@
           <div class="card__actions">
             <% if (isAdmin) { %>
               <div class="actions__admin">
-                <a href="/admin/edit-product/<%= product.id %>?edit=true" class="btn">Edit</a>
+                <a href="/admin/edit-product/<%= product._id %>?edit=true" class="btn">Edit</a>
                 <form action="/admin/delete-product" method="POST">
-                  <input type="hidden" name="id" value="<%= product.id %>">
+                  <input type="hidden" name="id" value="<%= product._id %>">
                   <button type="submit" class="btn">Delete</button>
                 </form>
               </div>
             <% } else { %>
-              <a href="/products/<%= product.id %>" class="btn">Details</a>
+              <a href="/products/<%= product._id %>" class="btn">Details</a>
               <%- include('product-add-cart', { product: product }); %>
             <% } %>
           </div>
