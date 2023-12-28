@@ -57,19 +57,8 @@ exports.getCartPage = async (req: Request, res: Response) => {
 }
 
 exports.postCart = async (req: Request, res: Response) => {
-  const productId = req.body.productId
-  req.user.getCart()
-    .then(async (cart: any) => {
-      const cartProducts = await cart.getProducts({ where: { id: productId } })
-      if (cartProducts.length > 0) {
-        const prod = cartProducts[0]
-        const quantity = prod.cartItem.quantity + 1
-        await cart.addProduct(prod, { through: { quantity } })
-      } else {
-        const prod = await Product.findByPk(productId)
-        await cart.addProduct(prod)
-      }
-    })
+  const product = await Product.findById(req.body.productId)
+  req.cart.addItem(product)
     .then(() => { res.redirect('/cart') })
     .catch((err: Error) => { console.log(err) })
 }

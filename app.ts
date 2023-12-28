@@ -12,7 +12,7 @@ const mongoConnect = require('./util/mongo-db').mongoConnect
 const sequelize = require('./util/db')
 // const Product = require('./models/product')
 const User = require('./models/user')
-// const Cart = require('./models/cart')
+const Cart = require('./models/cart')
 // const CartItem = require('./models/cart-item')
 
 const app: Express = express()
@@ -28,15 +28,15 @@ app.use((req: Request, res, next) => {
     .then((users: any[]) => {
       if (users[0]) {
         req.user = users[0]
-        next()
+        req.cart = new Cart(users[0].id)
       } else {
         User.create({ email: 'example@email.com', name: 'User1' })
           .then((user: any) => {
             req.user = user
-            // user.createCart()
-            next()
+            req.cart = new Cart(user.id)
           })
       }
+      next()
     })
 })
 

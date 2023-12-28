@@ -16,7 +16,7 @@ interface ICartProduct {
   qty: number
 }
 
-interface ICart {
+export interface ICart {
   products: ICartProduct[]
   totalPrice: number
 }
