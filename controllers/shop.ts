@@ -1,7 +1,6 @@
 import { type Request, type Response } from 'express'
 import { type TProduct } from '../models'
 
-const mongodb = require('mongodb')
 const Product = require('../models/product')
 
 exports.getIndexPage = async (req: Request, res: Response) => {
@@ -60,7 +59,6 @@ exports.postCart = async (req: Request, res: Response) => {
   const product = await Product.findById(req.body.productId)
   req.cart.addItem(product)
     .then(() => { res.redirect('/cart') })
-    .catch((err: Error) => { console.log(err) })
 }
 
 exports.postCartDeleteItem = async (req: Request, res: Response) => {

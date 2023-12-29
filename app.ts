@@ -25,15 +25,15 @@ app.use(express.static(path.join(__dirname, 'public')))
 // FOR DEVELOPMENT USE DUMMY USER + CART
 app.use((req: Request, res, next) => {
   User.findAll()
-    .then((users: any[]) => {
+    .then(async (users: any[]) => {
       if (users[0]) {
         req.user = users[0]
-        req.cart = new Cart(users[0].id)
+        req.cart = await new Cart(users[0].id).fetch()
       } else {
         User.create({ email: 'example@email.com', name: 'User1' })
-          .then((user: any) => {
+          .then(async (user: any) => {
             req.user = user
-            req.cart = new Cart(user.id)
+            req.cart = await new Cart(user.id).fetch()
           })
       }
       next()
