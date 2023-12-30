@@ -1,6 +1,8 @@
 import { type Request, type Response } from 'express'
 import { type TProduct } from '../models'
 
+const Order = require('../models/order')
+
 const Product = require('../models/product')
 
 exports.getIndexPage = async (req: Request, res: Response) => {
@@ -72,27 +74,15 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
 }
 
 exports.getOrdersPage = async (req: Request, res: Response) => {
-  req.user.getOrders({ include: ['products'] })
-    .then((orders: any[]) => {
-      res.render('pages/shop/orders', {
-        docTitle: 'Your Orders',
-        path: '/orders',
-        orders
-      })
-    })
-    .catch((err: Error) => { console.log(err) })
+  const orders = await new Order(req.user.id).getOrders()
+  res.render('pages/shop/orders', {
+    docTitle: 'Your Orders',
+    path: '/orders',
+    orders
+  })
 }
 
 exports.postOrder = async (req: Request, res: Response) => {
-  req.user.getCart().then(async (cart: any) => {
-    const products = await cart.getProducts()
-    const newOrder = await req.user.createOrder()
-    await newOrder.addProducts(products.map((product: any) => {
-      product.orderItem = { quantity: product.cartItem.quantity }
-      return product
-    }))
-    await cart.setProducts(null)
-    res.redirect(`/orders/${newOrder.id}`)
-  })
-    .catch((err: Error) => { console.log(err) })
+  const order = await Order.create(req.cart)
+  res.redirect(`/orders/${order.insertedId}`)
 }

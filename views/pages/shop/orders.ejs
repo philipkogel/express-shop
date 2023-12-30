@@ -2,7 +2,7 @@
 <html lang="en">
 
 <%- include('../../partials/head'); %>
-    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/orders.css">
 </head>
 
 <body>
@@ -13,14 +13,14 @@
             <h1>Nothing here!</h1>
         <% } else { %>
         <h1>Orders history</h1>
-            <ul>
+            <ul class="orders">
                 <% for (let order of orders) { %>
-                    <li>
-                        <h3># <%= order.id %> </h3>
-                        <ul>
+                    <li class="orders__item">
+                        <h1>Order - # <%= order._id %> </h1>
+                        <ul class="orders__products">
                             <% for (let product of order.products) { %>
-                            <li>
-                                <%= product.title %> (<%= product.orderItem.quantity %>)
+                            <li class="orders__products-item">
+                                <%= product.title %> (<%= product.quantity %>)
                             </li>
                             <% } %>
                         </ul>
