@@ -44,15 +44,12 @@ exports.getProductPage = async (req: Request, res: Response) => {
 }
 
 exports.getCartPage = async (req: Request, res: Response) => {
-  req.user.getCart().then(async (cart: any) => {
-    const cartProducts = await cart.getProducts()
-    res.render('pages/shop/cart', {
-      docTitle: 'Cart',
-      path: '/cart',
-      cartProducts
-    })
+  const cartProducts = await req.cart.getProducts()
+  res.render('pages/shop/cart', {
+    docTitle: 'Cart',
+    path: '/cart',
+    cartProducts
   })
-    .catch((err: Error) => { console.log(err) })
 }
 
 exports.postCart = async (req: Request, res: Response) => {
@@ -63,14 +60,7 @@ exports.postCart = async (req: Request, res: Response) => {
 
 exports.postCartDeleteItem = async (req: Request, res: Response) => {
   const productId = req.body.productId
-  req.user.getCart().then(async (cart: any) => {
-    const products = await cart.getProducts({ where: { id: productId } })
-    if (products.length > 0) {
-      await products[0].cartItem.destroy()
-    }
-  })
-    .then(() => { res.redirect('/cart') })
-    .catch((err: any) => { console.log(err) })
+  req.cart.deleteItem(productId).then(() => { res.redirect('/cart') })
 }
 
 exports.getCheckoutPage = async (req: Request, res: Response) => {

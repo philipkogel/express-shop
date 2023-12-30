@@ -1,10 +1,10 @@
-import { ObjectId } from 'mongodb'
-import { type ICart, type TProduct, type ICartProduct } from '.'
+import { type TProduct, type ICartProduct } from '.'
 
 const mongodb = require('mongodb')
 const getDb = require('../util/mongo-db').getDb
 
 const CARTS_COLLECTION = 'carts'
+const PRODUCTS_COLLECTION = 'products'
 
 class Cart {
   constructor (userId: string) {
@@ -41,20 +41,43 @@ class Cart {
 
   async fetch (): Promise<any> {
     const db = getDb()
-    const cart = await db.collection(CARTS_COLLECTION).findOne({ userId: this.userId })
-    this.items = cart.items
+    try {
+      const cart = await db.collection(CARTS_COLLECTION).findOne({ userId: this.userId })
+      this.items = cart.items
+    } catch (err: unknown) {
+      console.log(err)
+    }
 
     return this
   }
 
-  // static async findById (id: string): Promise<TProduct | undefined> {
-  //   const db = getDb()
-  //   try {
-  //     return db.collection(PRODUCTS_COLLECTION).findOne({ _id: new mongodb.ObjectId(id) })
-  //   } catch (err: unknown) {
-  //     console.log(err)
-  //   }
-  // }
+  async getProducts (): Promise<TProduct[] | undefined> {
+    const db = getDb()
+    try {
+      return db.collection(PRODUCTS_COLLECTION)
+        .find({ _id: { $in: this.items.map((i) => i.productId) } })
+        .toArray()
+        .then((products: TProduct[]) => products.map((p) => ({
+          ...p,
+          quantity: this.items.find((i) => i.productId.toString() === p._id?.toString())?.quantity
+        })))
+    } catch (err: unknown) {
+      console.log(err)
+    }
+  }
+
+  async deleteItem (productId: string): Promise<void> {
+    const db = getDb()
+    try {
+      return db.collection(CARTS_COLLECTION).updateOne({ userId: this.userId }, {
+        $set: {
+          items: this.items.filter((i) => i.productId.toString() !== productId)
+        }
+      })
+    } catch (err: unknown) {
+      console.log(err)
+    }
+  }
 }
 
 module.exports = Cart
