@@ -12,7 +12,7 @@ const mongoConnect = require('./util/mongo-db').mongoConnect
 const sequelize = require('./util/db')
 // const Product = require('./models/product')
 const User = require('./models/user')
-// const Cart = require('./models/cart')
+const Cart = require('./models/cart')
 // const CartItem = require('./models/cart-item')
 
 const app: Express = express()
@@ -25,18 +25,18 @@ app.use(express.static(path.join(__dirname, 'public')))
 // FOR DEVELOPMENT USE DUMMY USER + CART
 app.use((req: Request, res, next) => {
   User.findAll()
-    .then((users: any[]) => {
+    .then(async (users: any[]) => {
       if (users[0]) {
         req.user = users[0]
-        next()
+        req.cart = await new Cart(users[0].id).fetch()
       } else {
         User.create({ email: 'example@email.com', name: 'User1' })
-          .then((user: any) => {
+          .then(async (user: any) => {
             req.user = user
-            // user.createCart()
-            next()
+            req.cart = await new Cart(user.id).fetch()
           })
       }
+      next()
     })
 })
 

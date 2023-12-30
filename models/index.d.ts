@@ -12,11 +12,11 @@ export type TAdminProduct = TProduct & {
 }
 
 interface ICartProduct {
-  id: string
-  qty: number
+  productId: string
+  quantity: number
 }
 
-interface ICart {
+export interface ICart {
   products: ICartProduct[]
   totalPrice: number
 }

@@ -1,7 +1,6 @@
 import { type Request, type Response } from 'express'
 import { type TProduct } from '../models'
 
-const mongodb = require('mongodb')
 const Product = require('../models/product')
 
 exports.getIndexPage = async (req: Request, res: Response) => {
@@ -45,45 +44,23 @@ exports.getProductPage = async (req: Request, res: Response) => {
 }
 
 exports.getCartPage = async (req: Request, res: Response) => {
-  req.user.getCart().then(async (cart: any) => {
-    const cartProducts = await cart.getProducts()
-    res.render('pages/shop/cart', {
-      docTitle: 'Cart',
-      path: '/cart',
-      cartProducts
-    })
+  const cartProducts = await req.cart.getProducts()
+  res.render('pages/shop/cart', {
+    docTitle: 'Cart',
+    path: '/cart',
+    cartProducts
   })
-    .catch((err: Error) => { console.log(err) })
 }
 
 exports.postCart = async (req: Request, res: Response) => {
-  const productId = req.body.productId
-  req.user.getCart()
-    .then(async (cart: any) => {
-      const cartProducts = await cart.getProducts({ where: { id: productId } })
-      if (cartProducts.length > 0) {
-        const prod = cartProducts[0]
-        const quantity = prod.cartItem.quantity + 1
-        await cart.addProduct(prod, { through: { quantity } })
-      } else {
-        const prod = await Product.findByPk(productId)
-        await cart.addProduct(prod)
-      }
-    })
+  const product = await Product.findById(req.body.productId)
+  req.cart.addItem(product)
     .then(() => { res.redirect('/cart') })
-    .catch((err: Error) => { console.log(err) })
 }
 
 exports.postCartDeleteItem = async (req: Request, res: Response) => {
   const productId = req.body.productId
-  req.user.getCart().then(async (cart: any) => {
-    const products = await cart.getProducts({ where: { id: productId } })
-    if (products.length > 0) {
-      await products[0].cartItem.destroy()
-    }
-  })
-    .then(() => { res.redirect('/cart') })
-    .catch((err: any) => { console.log(err) })
+  req.cart.deleteItem(productId).then(() => { res.redirect('/cart') })
 }
 
 exports.getCheckoutPage = async (req: Request, res: Response) => {
