@@ -10,10 +10,8 @@ const shopRoutes = require('./routes/shop')
 const errorsController = require('./controllers/errors')
 const mongoConnect = require('./util/mongo-db').mongoConnect
 const sequelize = require('./util/db')
-// const Product = require('./models/product')
 const User = require('./models/user')
 const Cart = require('./models/cart')
-// const CartItem = require('./models/cart-item')
 
 const app: Express = express()
 
@@ -44,12 +42,6 @@ app.use('/admin', adminRoutes)
 app.use(shopRoutes)
 
 app.use(errorsController.get404ErrorPage)
-
-// Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' })
-// User.hasMany(Product)
-// User.hasOne(Cart)
-// Cart.belongsToMany(Product, { through: CartItem })
-// Product.belongsToMany(Cart, { through: CartItem })
 
 sequelize.sync()
   .then(() => mongoConnect(() => {

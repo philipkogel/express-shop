@@ -2,7 +2,7 @@ import { type TProduct } from '.'
 const mongodb = require('mongodb')
 const getDb = require('../util/mongo-db').getDb
 
-const PRODUCTS_COLLECTION = 'products'
+const PRODUCTS_COLLECTION = process.env.MONGO_PRODUCTS_COLLECTION
 
 class Product implements TProduct {
   constructor (prod: TProduct) {

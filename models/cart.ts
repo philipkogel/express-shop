@@ -3,8 +3,8 @@ import { type TProduct, type ICartProduct } from '.'
 const mongodb = require('mongodb')
 const getDb = require('../util/mongo-db').getDb
 
-const CARTS_COLLECTION = 'carts'
-const PRODUCTS_COLLECTION = 'products'
+const CARTS_COLLECTION = process.env.MONGO_CART_COLLECTION
+const PRODUCTS_COLLECTION = process.env.MONGO_PRODUCTS_COLLECTION
 
 class Cart {
   constructor (userId: string) {
@@ -72,6 +72,19 @@ class Cart {
       return db.collection(CARTS_COLLECTION).updateOne({ userId: this.userId }, {
         $set: {
           items: this.items.filter((i) => i.productId.toString() !== productId)
+        }
+      })
+    } catch (err: unknown) {
+      console.log(err)
+    }
+  }
+
+  async clear (): Promise<void> {
+    const db = getDb()
+    try {
+      return db.collection(CARTS_COLLECTION).updateOne({ userId: this.userId }, {
+        $set: {
+          items: []
         }
       })
     } catch (err: unknown) {
