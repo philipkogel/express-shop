@@ -57,6 +57,16 @@ CartSchema.method('addItem', function (product: TProduct): any {
   }
 })
 
+CartSchema.method('deleteItem', function (productId: string): any {
+  const updatedCartItems = this.items.filter((i) => i.productId.toString() !== productId)
+  this.items = updatedCartItems
+  try {
+    return this.save()
+  } catch (err: unknown) {
+    console.log(err)
+  }
+})
+
 CartSchema.method('getProducts', function (): any {
   return this.populate('items.productId')
     .then((products: any) => products.items)

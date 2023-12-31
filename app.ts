@@ -36,7 +36,6 @@ app.use((req: Request, res, next) => {
           await req.cart.save()
         }
       } else {
-        console.log('CREATE USER')
         User.create({ email: 'example@email.com', name: 'User1' })
           .then(async (user: any) => {
             req.user = user

@@ -56,7 +56,6 @@ exports.getCartPage = async (req: Request, res: Response) => {
 
 exports.postCart = async (req: Request, res: Response) => {
   const product = await Product.findById(req.body.productId)
-  console.log(req.cart)
   req.cart.addItem(product)
     .then(() => { res.redirect('/cart') })
 }
@@ -84,6 +83,17 @@ exports.getOrdersPage = async (req: Request, res: Response) => {
 }
 
 exports.postOrder = async (req: Request, res: Response) => {
-  const order = await Order.create(req.cart)
+  const products = await req.cart.getProducts()
+  const order = new Order({
+    products: products.map((p) => ({ quantity: p.quantity, product: { ...p.productId._doc } })),
+    user: {
+      userId: req.user.id,
+      name: req.user.name,
+      email: req.user.email
+    }
+  })
+  await order.save()
+  // TODO: CLEAR CART
+  console.log(order)
   res.redirect(`/orders/${order.insertedId}`)
 }
