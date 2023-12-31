@@ -1,5 +1,5 @@
 export interface TProduct {
-  _id: string | undefined
+  _id: string
   title: string
   imageUrl: string
   description: string

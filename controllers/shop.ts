@@ -5,8 +5,8 @@ const Order = require('../models/order')
 
 const Product = require('../models/product')
 
-exports.getIndexPage = async (req: Request, res: Response) => {
-  await Product.findAll()
+exports.getIndexPage = (req: Request, res: Response) => {
+  Product.find()
     .then((products: TProduct[]) => {
       res.render('pages/shop/index', {
         docTitle: 'Fancy Shop',
@@ -18,8 +18,8 @@ exports.getIndexPage = async (req: Request, res: Response) => {
     .catch((err: any) => { console.log(err) })
 }
 
-exports.getProductsPage = async (req: Request, res: Response) => {
-  await Product.findAll()
+exports.getProductsPage = (req: Request, res: Response) => {
+  Product.find()
     .then((products: TProduct[]) => {
       res.render('pages/shop/product-list', {
         docTitle: 'Products',
@@ -56,6 +56,7 @@ exports.getCartPage = async (req: Request, res: Response) => {
 
 exports.postCart = async (req: Request, res: Response) => {
   const product = await Product.findById(req.body.productId)
+  console.log(req.cart)
   req.cart.addItem(product)
     .then(() => { res.redirect('/cart') })
 }
