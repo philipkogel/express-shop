@@ -72,4 +72,9 @@ CartSchema.method('getProducts', function (): any {
     .then((products: any) => products.items)
 })
 
+CartSchema.method('clear', function (): any {
+  this.items = []
+  return this.save()
+})
+
 module.exports = CartSchema

@@ -20,7 +20,7 @@
                         <ul class="orders__products">
                             <% for (let product of order.products) { %>
                             <li class="orders__products-item">
-                                <%= product.title %> (<%= product.quantity %>)
+                                <%= product.product.title %> (<%= product.quantity %>)
                             </li>
                             <% } %>
                         </ul>

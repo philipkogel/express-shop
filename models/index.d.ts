@@ -7,10 +7,6 @@ export interface TProduct {
   createdAt: string
 }
 
-export type TAdminProduct = TProduct & {
-  userId: string
-}
-
 interface ICartProduct {
   productId: string
   quantity: number
