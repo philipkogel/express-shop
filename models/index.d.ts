@@ -1,14 +1,10 @@
 export interface TProduct {
-  _id: string | undefined
+  _id: string
   title: string
   imageUrl: string
   description: string
   price: number
   createdAt: string
-}
-
-export type TAdminProduct = TProduct & {
-  userId: string
 }
 
 interface ICartProduct {

@@ -5,8 +5,8 @@ const Order = require('../models/order')
 
 const Product = require('../models/product')
 
-exports.getIndexPage = async (req: Request, res: Response) => {
-  await Product.findAll()
+exports.getIndexPage = (req: Request, res: Response) => {
+  Product.find()
     .then((products: TProduct[]) => {
       res.render('pages/shop/index', {
         docTitle: 'Fancy Shop',
@@ -18,8 +18,8 @@ exports.getIndexPage = async (req: Request, res: Response) => {
     .catch((err: any) => { console.log(err) })
 }
 
-exports.getProductsPage = async (req: Request, res: Response) => {
-  await Product.findAll()
+exports.getProductsPage = (req: Request, res: Response) => {
+  Product.find()
     .then((products: TProduct[]) => {
       res.render('pages/shop/product-list', {
         docTitle: 'Products',
@@ -74,7 +74,8 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
 }
 
 exports.getOrdersPage = async (req: Request, res: Response) => {
-  const orders = await new Order(req.user.id).getOrders()
+  const orders = await Order.find({ 'user.userId': req.user.id })
+  console.log(orders)
   res.render('pages/shop/orders', {
     docTitle: 'Your Orders',
     path: '/orders',
@@ -83,6 +84,16 @@ exports.getOrdersPage = async (req: Request, res: Response) => {
 }
 
 exports.postOrder = async (req: Request, res: Response) => {
-  const order = await Order.create(req.cart)
-  res.redirect(`/orders/${order.insertedId}`)
+  const products = await req.cart.getProducts()
+  const order = new Order({
+    products: products.map((p: any) => ({ quantity: p.quantity, product: { ...p.productId._doc } })),
+    user: {
+      userId: req.user.id,
+      name: req.user.name,
+      email: req.user.email
+    }
+  })
+  await order.save()
+  req.cart.clear()
+  res.redirect(`/orders/${order._id}`)
 }
