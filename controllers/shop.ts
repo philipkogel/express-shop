@@ -75,7 +75,6 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
 
 exports.getOrdersPage = async (req: Request, res: Response) => {
   const orders = await Order.find({ 'user.userId': req.user.id })
-  console.log(orders)
   res.render('pages/shop/orders', {
     docTitle: 'Your Orders',
     path: '/orders',
