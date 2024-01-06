@@ -8,7 +8,8 @@ exports.getAddProductPage = (req: Request, res: Response) => {
   res.render('pages/admin/edit-product', {
     docTitle: 'Add Product',
     path: '/admin/add-product',
-    editMode
+    editMode,
+    isAuthenticated: req.isAuthenticated
   })
 }
 
@@ -21,7 +22,8 @@ exports.getEditProductPage = async (req: Request, res: Response) => {
       docTitle: 'Edit Product',
       path: '/admin/edit-product',
       editMode,
-      product
+      product,
+      isAuthenticated: req.isAuthenticated
     })
   } else {
     res.redirect('/')
@@ -57,7 +59,8 @@ exports.getProductsPage = async (req: Request, res: Response) => {
         docTitle: 'Admin Products',
         path: '/admin/products',
         products,
-        isAdmin: true
+        isAdmin: true,
+        isAuthenticated: req.isAuthenticated
       })
     })
     .catch((err: any) => { console.log(err) })

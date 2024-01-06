@@ -12,7 +12,8 @@ exports.getIndexPage = (req: Request, res: Response) => {
         docTitle: 'Fancy Shop',
         path: '/',
         products,
-        isAdmin: false
+        isAdmin: false,
+        isAuthenticated: req.isAuthenticated
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -25,7 +26,8 @@ exports.getProductsPage = (req: Request, res: Response) => {
         docTitle: 'Products',
         path: '/products',
         products,
-        isAdmin: false
+        isAdmin: false,
+        isAuthenticated: req.isAuthenticated
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -38,7 +40,8 @@ exports.getProductPage = async (req: Request, res: Response) => {
       docTitle: `Product - ${product.title}`,
       path: `/products/${product._id}`,
       product,
-      isAdmin: false
+      isAdmin: false,
+      isAuthenticated: req.isAuthenticated
     })
   } else {
     res.redirect('/')
@@ -50,7 +53,8 @@ exports.getCartPage = async (req: Request, res: Response) => {
   res.render('pages/shop/cart', {
     docTitle: 'Cart',
     path: '/cart',
-    cartProducts
+    cartProducts,
+    isAuthenticated: req.isAuthenticated
   })
 }
 
@@ -69,7 +73,8 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
   res.render('pages/shop/checkout', {
     docTitle: 'Checkout',
     path: '/checkout',
-    products: await Product.fetchAll()
+    products: await Product.fetchAll(),
+    isAuthenticated: req.isAuthenticated
   })
 }
 
@@ -78,7 +83,8 @@ exports.getOrdersPage = async (req: Request, res: Response) => {
   res.render('pages/shop/orders', {
     docTitle: 'Your Orders',
     path: '/orders',
-    orders
+    orders,
+    isAuthenticated: req.isAuthenticated
   })
 }
 
