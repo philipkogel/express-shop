@@ -9,7 +9,7 @@ exports.getAddProductPage = (req: Request, res: Response) => {
     docTitle: 'Add Product',
     path: '/admin/add-product',
     editMode,
-    isAuthenticated: req.isAuthenticated
+    isAuthenticated: req.session.isAuthenticated
   })
 }
 
@@ -23,7 +23,7 @@ exports.getEditProductPage = async (req: Request, res: Response) => {
       path: '/admin/edit-product',
       editMode,
       product,
-      isAuthenticated: req.isAuthenticated
+      isAuthenticated: req.session.isAuthenticated
     })
   } else {
     res.redirect('/')
@@ -60,7 +60,7 @@ exports.getProductsPage = async (req: Request, res: Response) => {
         path: '/admin/products',
         products,
         isAdmin: true,
-        isAuthenticated: req.isAuthenticated
+        isAuthenticated: req.session.isAuthenticated
       })
     })
     .catch((err: any) => { console.log(err) })

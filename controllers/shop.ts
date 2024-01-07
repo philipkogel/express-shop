@@ -13,7 +13,7 @@ exports.getIndexPage = (req: Request, res: Response) => {
         path: '/',
         products,
         isAdmin: false,
-        isAuthenticated: req.isAuthenticated
+        isAuthenticated: req.session.isAuthenticated
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -27,7 +27,7 @@ exports.getProductsPage = (req: Request, res: Response) => {
         path: '/products',
         products,
         isAdmin: false,
-        isAuthenticated: req.isAuthenticated
+        isAuthenticated: req.session.isAuthenticated
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -41,7 +41,7 @@ exports.getProductPage = async (req: Request, res: Response) => {
       path: `/products/${product._id}`,
       product,
       isAdmin: false,
-      isAuthenticated: req.isAuthenticated
+      isAuthenticated: req.session.isAuthenticated
     })
   } else {
     res.redirect('/')
@@ -54,7 +54,7 @@ exports.getCartPage = async (req: Request, res: Response) => {
     docTitle: 'Cart',
     path: '/cart',
     cartProducts,
-    isAuthenticated: req.isAuthenticated
+    isAuthenticated: req.session.isAuthenticated
   })
 }
 
@@ -74,7 +74,7 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
     docTitle: 'Checkout',
     path: '/checkout',
     products: await Product.fetchAll(),
-    isAuthenticated: req.isAuthenticated
+    isAuthenticated: req.session.isAuthenticated
   })
 }
 
@@ -84,7 +84,7 @@ exports.getOrdersPage = async (req: Request, res: Response) => {
     docTitle: 'Your Orders',
     path: '/orders',
     orders,
-    isAuthenticated: req.isAuthenticated
+    isAuthenticated: req.session.isAuthenticated
   })
 }
 

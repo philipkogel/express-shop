@@ -5,13 +5,17 @@ const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose: Mongoose = require('mongoose')
+const session = require('express-session')
 
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 const authRoutes = require('./routes/auth')
 
 const errorsController = require('./controllers/errors')
+
 const sequelize = require('./util/db')
+const SequelizeStore = require('connect-session-sequelize')(session.Store)
+
 const User = require('./models/user')
 const Cart = require('./models/cart')
 
@@ -21,6 +25,15 @@ app.set('view engine', 'ejs')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(session({
+  secret: '$ecret',
+  store: new SequelizeStore({
+    db: sequelize
+  }),
+  resave: false,
+  saveUninitialized: false,
+  proxy: true
+}))
 
 // FOR DEVELOPMENT USE DUMMY USER + CART
 app.use((req: Request, res, next) => {
