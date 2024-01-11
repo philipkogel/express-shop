@@ -13,7 +13,7 @@ exports.getIndexPage = (req: Request, res: Response) => {
         path: '/',
         products,
         isAdmin: false,
-        isAuthenticated: req.session.isAuthenticated
+        isAuthenticated: req.session.user
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -27,7 +27,7 @@ exports.getProductsPage = (req: Request, res: Response) => {
         path: '/products',
         products,
         isAdmin: false,
-        isAuthenticated: req.session.isAuthenticated
+        isAuthenticated: req.session.user
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -41,7 +41,7 @@ exports.getProductPage = async (req: Request, res: Response) => {
       path: `/products/${product._id}`,
       product,
       isAdmin: false,
-      isAuthenticated: req.session.isAuthenticated
+      isAuthenticated: req.session.user
     })
   } else {
     res.redirect('/')
@@ -54,7 +54,7 @@ exports.getCartPage = async (req: Request, res: Response) => {
     docTitle: 'Cart',
     path: '/cart',
     cartProducts,
-    isAuthenticated: req.session.isAuthenticated
+    isAuthenticated: req.session.user
   })
 }
 
@@ -74,17 +74,17 @@ exports.getCheckoutPage = async (req: Request, res: Response) => {
     docTitle: 'Checkout',
     path: '/checkout',
     products: await Product.fetchAll(),
-    isAuthenticated: req.session.isAuthenticated
+    isAuthenticated: req.session.user
   })
 }
 
 exports.getOrdersPage = async (req: Request, res: Response) => {
-  const orders = await Order.find({ 'user.userId': req.user.id })
+  const orders = await Order.find({ 'user.userId': req.session.user.id })
   res.render('pages/shop/orders', {
     docTitle: 'Your Orders',
     path: '/orders',
     orders,
-    isAuthenticated: req.session.isAuthenticated
+    isAuthenticated: req.session.user
   })
 }
 
@@ -93,9 +93,9 @@ exports.postOrder = async (req: Request, res: Response) => {
   const order = new Order({
     products: products.map((p: any) => ({ quantity: p.quantity, product: { ...p.productId._doc } })),
     user: {
-      userId: req.user.id,
-      name: req.user.name,
-      email: req.user.email
+      userId: req.session.user.id,
+      name: req.session.user.name,
+      email: req.session.user.email
     }
   })
   await order.save()

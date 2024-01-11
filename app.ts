@@ -16,9 +16,6 @@ const errorsController = require('./controllers/errors')
 const sequelize = require('./util/db')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 
-const User = require('./models/user')
-const Cart = require('./models/cart')
-
 const app: Express = express()
 
 app.set('view engine', 'ejs')
@@ -34,35 +31,6 @@ app.use(session({
   saveUninitialized: false,
   proxy: true
 }))
-
-// FOR DEVELOPMENT USE DUMMY USER + CART
-app.use((req: Request, res, next) => {
-  User.findAll()
-    .then(async (users: any[]) => {
-      if (users[0]) {
-        req.user = users[0]
-        req.cart = await Cart.findOne({ userId: users[0].id })
-        if (!req.cart) {
-          req.cart = new Cart({
-            userId: users[0].id,
-            items: []
-          })
-          await req.cart.save()
-        }
-      } else {
-        User.create({ email: 'example@email.com', name: 'User1' })
-          .then(async (user: any) => {
-            req.user = user
-            req.cart = new Cart({
-              userId: user.id,
-              items: []
-            })
-            await req.cart.save()
-          })
-      }
-      next()
-    })
-})
 
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
