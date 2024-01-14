@@ -1,4 +1,4 @@
-import { type Express, type Request } from 'express'
+import { type Express, type Request, type Response } from 'express'
 import { type Mongoose } from 'mongoose'
 
 const path = require('path')
@@ -18,6 +18,8 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store)
 
 const app: Express = express()
 
+const middleware = require('./util/middleware')
+
 app.set('view engine', 'ejs')
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -31,6 +33,8 @@ app.use(session({
   saveUninitialized: false,
   proxy: true
 }))
+
+app.use((req: Request, _: Response, next) => middleware.cartMiddleware(req, next))
 
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
