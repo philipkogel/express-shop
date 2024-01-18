@@ -8,12 +8,13 @@ exports.getAddProductPage = (req: Request, res: Response) => {
   res.render('pages/admin/edit-product', {
     docTitle: 'Add Product',
     path: '/admin/add-product',
-    editMode
+    editMode,
+    isAuthenticated: req.session.user
   })
 }
 
 exports.getEditProductPage = async (req: Request, res: Response) => {
-  const product = await Product.findOne({ _id: req.params.id, userId: req.user.id })
+  const product = await Product.findOne({ _id: req.params.id, userId: req.session.user.id })
     .catch((err: any) => { console.log(err) })
   if (product) {
     const editMode = req.query.edit
@@ -21,7 +22,8 @@ exports.getEditProductPage = async (req: Request, res: Response) => {
       docTitle: 'Edit Product',
       path: '/admin/edit-product',
       editMode,
-      product
+      product,
+      isAuthenticated: req.session.user
     })
   } else {
     res.redirect('/')
@@ -30,7 +32,7 @@ exports.getEditProductPage = async (req: Request, res: Response) => {
 
 exports.postAddProduct = (req: Request, res: Response) => {
   const { title, imageUrl, price, description } = req.body
-  const { id } = req.user
+  const { id } = req.session.user
   new Product({
     title,
     price,
@@ -44,20 +46,21 @@ exports.postAddProduct = (req: Request, res: Response) => {
 
 exports.postEditProduct = async (req: Request, res: Response) => {
   const { title, imageUrl, price, description, id } = req.body
-  Product.updateOne({ _id: id, userId: req.user.id }, { title, imageUrl, price, description })
+  Product.updateOne({ _id: id, userId: req.session.user.id }, { title, imageUrl, price, description })
     .then(() => { res.redirect('/admin/products') })
     .catch((err: any) => { console.log(err) })
 }
 
 exports.getProductsPage = async (req: Request, res: Response) => {
-  const { id } = req.user
+  const { id } = req.session.user
   Product.find({ userId: id })
     .then((products: TProduct[]) => {
       res.render('pages/admin/product-list', {
         docTitle: 'Admin Products',
         path: '/admin/products',
         products,
-        isAdmin: true
+        isAdmin: true,
+        isAuthenticated: req.session.user
       })
     })
     .catch((err: any) => { console.log(err) })
@@ -65,7 +68,7 @@ exports.getProductsPage = async (req: Request, res: Response) => {
 
 exports.postDeleteProduct = async (req: Request, res: Response) => {
   const { id } = req.body
-  await Product.deleteOne({ _id: id, userId: req.user.id })
+  await Product.deleteOne({ _id: id, userId: req.session.user.id })
     .then(() => { res.redirect('/admin/products') })
     .catch((err: any) => { console.log(err) })
 }
