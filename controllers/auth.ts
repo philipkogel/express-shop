@@ -31,3 +31,30 @@ exports.postLogout = (req: Request, res: Response) => {
     res.redirect('/')
   })
 }
+
+exports.getSignup = (req: Request, res: Response) => {
+  res.render('pages/auth/signup', {
+    path: '/signup',
+    docTitle: 'Signup',
+    isAuthenticated: false
+  })
+}
+
+exports.postSignup = async (req: Request, res: Response) => {
+  const { email, password, confirmPassword } = req.body
+  const [user, created] = await User.findOrCreate({
+    where: { email },
+    defaults: {
+      email,
+      password,
+      name: email
+    }
+  })
+
+  if (!created) {
+    // TODO: Show error message
+    console.log('user already exists!')
+  }
+
+  res.redirect('/login')
+}
