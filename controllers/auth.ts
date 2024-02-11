@@ -10,19 +10,18 @@ exports.getLogin = (req: Request, res: Response) => {
   })
 }
 
-exports.postLogin = (req: Request, res: Response) => {
-  User.findAll()
-    .then(async (users: any[]) => {
-      if (users[0]) {
-        req.session.user = users[0]
-      } else {
-        User.create({ email: 'example@email.com', name: 'User1' })
-          .then(async (user: any) => {
-            req.session.user = user
-          })
-      }
-      res.redirect('/')
-    })
+exports.postLogin = async (req: Request, res: Response) => {
+  const { email, password } = req.body
+  const user = await User.findOne({
+    where: {
+      email
+    }
+  })
+  const verified = await user.correctPassword(password)
+  if (verified) {
+    req.session.user = user
+    res.redirect('/')
+  }
 }
 
 exports.postLogout = (req: Request, res: Response) => {
